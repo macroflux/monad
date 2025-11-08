@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ultrasonic Frame v1",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "front",
+    "rear",
+    "left",
+    "right"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "front": {
+      "type": "number"
+    },
+    "rear": {
+      "type": "number"
+    },
+    "left": {
+      "type": "number"
+    },
+    "right": {
+      "type": "number"
+    }
+  }
+}

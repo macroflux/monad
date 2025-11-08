@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IMU Frame v1",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "yaw",
+    "pitch",
+    "roll"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "yaw": {
+      "type": "number"
+    },
+    "pitch": {
+      "type": "number"
+    },
+    "roll": {
+      "type": "number"
+    },
+    "ax": {
+      "type": "number"
+    },
+    "ay": {
+      "type": "number"
+    },
+    "az": {
+      "type": "number"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Metrics v1",
+  "type": "object",
+  "properties": {
+    "coverage": {
+      "type": "number"
+    },
+    "latency_ms": {
+      "type": "number"
+    },
+    "collisions": {
+      "type": "integer"
+    },
+    "stability_events": {
+      "type": "integer"
+    }
+  }
+}
