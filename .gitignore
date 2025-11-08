@@ -1,0 +1,15 @@
+.DS_Store
+*.log
+.env
+.env.*
+__pycache__/
+node_modules/
+dist/
+build/
+.venv/
+*.pyc
+*.pyo
+.coverage
+.ipynb_checkpoints/
+datasets/raw/
+artifacts/

@@ -1,0 +1,20 @@
+%% docs/diagrams/architecture.mmd
+flowchart LR
+  UI[Web/CLI/Apps] --> REN[REN Cognition]
+  Tools[Dev Tools] --> REN
+  REN --> WS[Workflows / Jobs]
+  REN --> AB[Actuator Bus]
+  subgraph Intelligence
+    PP[Perception] --> PL[Planning] --> CTRL[Controllers]
+    LLM[Generative] --> PL
+    ML[Classical ML] --> PL
+  end
+  subgraph Data & Knowledge
+    KG[Ontology] --- DS[Datasets] --- MLReg[Model Registry] --- Tele[Telemetry]
+  end
+  subgraph Runtime
+    Sim[Unity/Gazebo] --- Edge[Arduino/RPi] --- Cloud[AWS/Containers] --- DB[PostgreSQL]
+  end
+  AB --- Sim
+  AB --- Edge
+  Cloud <--> DB

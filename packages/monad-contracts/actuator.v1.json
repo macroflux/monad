@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Actuator Command v1",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "command"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "command": {
+      "type": "string",
+      "enum": [
+        "drive",
+        "stop",
+        "brake"
+      ]
+    },
+    "params": {
+      "type": "object"
+    }
+  }
+}
