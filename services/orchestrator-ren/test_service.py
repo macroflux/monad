@@ -122,10 +122,10 @@ def test_service():
         result = resp.json()
         
         if result['status'] == 'failed' and 'threshold' in result.get('error', '').lower():
-            print(f"✓ Safety check passed: Speed limit enforced")
+            print("✓ Safety check passed: Speed limit enforced")
             print(f"✓ Error: {result['error']}")
         else:
-            print(f"✗ Safety check failed: Speed limit not enforced")
+            print("✗ Safety check failed: Speed limit not enforced")
             return False
     except Exception as e:
         print(f"✗ Failed: {e}")
