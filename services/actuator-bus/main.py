@@ -9,11 +9,12 @@ Endpoint:
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, Dict, Any
 
 from fastapi import FastAPI, HTTPException, status, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -108,7 +109,7 @@ async def actuate(request: ActuateRequest):
     
     Logs all valid requests at INFO level.
     """
-    received_at = datetime.utcnow().isoformat() + "Z"
+    received_at = datetime.now(timezone.utc).isoformat()
     
     # Log successful command receipt
     logger.info(
@@ -138,8 +139,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # Custom validation error handler for more detailed logging
-from fastapi.exceptions import RequestValidationError
-
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """
