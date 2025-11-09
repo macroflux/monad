@@ -12,4 +12,4 @@ jobs:
       - run: pip install ruff black mypy
       - run: ruff check .
       - run: black --check .
-      - run: mypy --ignore-missing-imports --explicit-package-bases .
+      - run: mypy --ignore-missing-imports --namespace-packages --explicit-package-bases .
