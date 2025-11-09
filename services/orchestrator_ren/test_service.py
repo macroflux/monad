@@ -167,7 +167,7 @@ if __name__ == "__main__":
         except requests.exceptions.RequestException:
             time.sleep(retry_delay)
     else:
-        print("ERROR: Service failed to respond after {max_retries * retry_delay}s")
+        print(f"ERROR: Service failed to respond after {max_retries * retry_delay}s")
         proc.terminate()
         sys.exit(1)
 
@@ -193,6 +193,7 @@ if __name__ == "__main__":
                 proc.kill()
                 proc.wait(timeout=5)
             except Exception:
+                # Ignore errors during cleanup; process is being killed and we're exiting anyway
                 pass
 
         sys.exit(0 if success else 1)
@@ -207,6 +208,7 @@ if __name__ == "__main__":
                 proc.kill()
                 proc.wait(timeout=5)
             except Exception:
+                # Ignore errors during process kill/wait; program is exiting
                 pass
         sys.exit(1)
 
@@ -220,5 +222,6 @@ if __name__ == "__main__":
                 proc.kill()
                 proc.wait(timeout=5)
             except Exception:
+                # If both terminate and kill fail, there's nothing more we can do
                 pass
         sys.exit(1)

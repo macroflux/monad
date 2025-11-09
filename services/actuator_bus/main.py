@@ -16,7 +16,7 @@ from typing import Optional, Dict, Any
 from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 # Configure logging
 logging.basicConfig(
@@ -57,8 +57,8 @@ class ActuateRequest(BaseModel):
         except ValueError:
             raise ValueError("timestamp must be valid ISO 8601 format")
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "examples": [
                 {
                     "timestamp": "2025-11-08T10:30:00Z",
@@ -68,7 +68,7 @@ class ActuateRequest(BaseModel):
                 {"timestamp": "2025-11-08T10:31:00Z", "command": "stop"},
             ]
         }
-    }
+    )
 
 
 class ActuateResponse(BaseModel):

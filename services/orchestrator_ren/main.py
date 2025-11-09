@@ -16,7 +16,7 @@ from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 # ============================================================================
@@ -113,8 +113,8 @@ class TicketCreateRequest(BaseModel):
         default_factory=dict, description="Additional metadata"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "command": "drive",
                 "params": {"speed": 1.5, "direction": 90, "duration_seconds": 10},
@@ -123,6 +123,7 @@ class TicketCreateRequest(BaseModel):
                 "metadata": {"operator": "user-001", "session_id": "ses-123"},
             }
         }
+    )
 
 
 class Ticket(BaseModel):
@@ -157,10 +158,11 @@ class ExecuteRequest(BaseModel):
         default=False, description="Force execution even if already executed"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {"ticket_id": "tick-20251108-a3f7e9c0", "force": False}
         }
+    )
 
 
 class ExecuteResponse(BaseModel):
@@ -251,8 +253,10 @@ async def create_ticket(request: TicketCreateRequest):
     Emits telemetry for ticket creation.
     """
     # Generate unique ticket ID
-    ticket_id = f"tick-{datetime.utcnow().strftime('%Y%m%d')}-{uuid4().hex[:8]}"
-    now = datetime.utcnow().isoformat() + "Z"
+    ticket_id = (
+        f"tick-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid4().hex[:8]}"
+    )
+    now = datetime.now(timezone.utc).isoformat()
 
     # Create ticket
     ticket = Ticket(
@@ -308,7 +312,7 @@ async def execute_ticket(request: ExecuteRequest):
     Simulates execution and updates ticket status.
     Emits telemetry for execution tracking.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     ticket_id = request.ticket_id
 
     # Validate ticket exists
@@ -331,7 +335,7 @@ async def execute_ticket(request: ExecuteRequest):
         )
 
     # Update ticket to executing
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat()
     ticket.status = TicketStatus.EXECUTING
     ticket.started_at = now
     ticket.updated_at = now
@@ -347,10 +351,12 @@ async def execute_ticket(request: ExecuteRequest):
         # Update ticket to completed
         ticket.status = TicketStatus.COMPLETED
         ticket.result = result
-        ticket.completed_at = datetime.utcnow().isoformat() + "Z"
+        ticket.completed_at = datetime.now(timezone.utc).isoformat()
         ticket.updated_at = ticket.completed_at
 
-        execution_time_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+        execution_time_ms = (
+            datetime.now(timezone.utc) - start_time
+        ).total_seconds() * 1000
 
         # Emit success telemetry
         telemetry.emit_event(
@@ -380,10 +386,12 @@ async def execute_ticket(request: ExecuteRequest):
         # Update ticket to failed
         ticket.status = TicketStatus.FAILED
         ticket.error = str(e)
-        ticket.completed_at = datetime.utcnow().isoformat() + "Z"
+        ticket.completed_at = datetime.now(timezone.utc).isoformat()
         ticket.updated_at = ticket.completed_at
 
-        execution_time_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+        execution_time_ms = (
+            datetime.now(timezone.utc) - start_time
+        ).total_seconds() * 1000
 
         # Emit failure telemetry
         telemetry.emit_event(
