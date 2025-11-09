@@ -9,7 +9,8 @@ Endpoints:
 - POST /execute: Execute a ticket and return results
 """
 
-from datetime import datetime
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import uuid4
@@ -32,7 +33,7 @@ class TelemetryCollector:
     def emit_metric(self, name: str, value: float, tags: Optional[Dict[str, Any]] = None):
         """Emit a metric."""
         self.metrics.append({
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "name": name,
             "value": value,
             "tags": tags or {}
@@ -42,7 +43,7 @@ class TelemetryCollector:
     def emit_event(self, event_type: str, data: Dict[str, Any]):
         """Emit an event."""
         self.events.append({
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "type": event_type,
             "data": data
         })
@@ -50,6 +51,15 @@ class TelemetryCollector:
 
 
 telemetry = TelemetryCollector()
+
+
+# ============================================================================
+# SAFETY CONSTANTS
+# ============================================================================
+
+MAX_SAFE_SPEED_MS = 3.0  # Maximum safe speed in m/s
+MAX_DIRECTION_DEGREES = 360  # Maximum direction in degrees
+MAX_DURATION_SECONDS = 300  # Maximum duration (5 minutes)
 
 
 # ============================================================================
@@ -143,10 +153,35 @@ tickets_db: Dict[str, Ticket] = {}
 
 
 # ============================================================================
+# LIFESPAN CONTEXT MANAGER
+# ============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifecycle events."""
+    # Startup
+    telemetry.emit_event("service_started", {
+        "service": "orchestrator-ren",
+        "version": "0.1.0"
+    })
+    print("[STARTUP] Orchestrator-REN service started")
+    
+    yield
+    
+    # Shutdown
+    telemetry.emit_event("service_stopped", {
+        "service": "orchestrator-ren",
+        "total_tickets": len(tickets_db)
+    })
+    print("[SHUTDOWN] Orchestrator-REN service stopped")
+
+
+# ============================================================================
 # FASTAPI APP
 # ============================================================================
 
 app = FastAPI(
+    lifespan=lifespan,
     title="MONAD Orchestrator-REN",
     description="Robot Execution Orchestrator - manages task tickets and execution",
     version="0.1.0"
@@ -394,13 +429,37 @@ def _execute_command(command: str, params: Dict[str, Any]) -> Dict[str, Any]:
     """
     # Simulate command execution
     if command == "drive":
-        speed = params.get("speed", 1.0)
-        direction = params.get("direction", 0)
-        duration = params.get("duration_seconds", 5)
+        # Validate required parameters
+        if "speed" not in params:
+            raise ValueError("Missing required parameter: speed")
+        if "duration_seconds" not in params:
+            raise ValueError("Missing required parameter: duration_seconds")
         
-        # Safety check: validate speed threshold
-        if speed > 3.0:
-            raise ValueError(f"Speed {speed} exceeds safety threshold of 3.0 m/s")
+        speed = params["speed"]
+        direction = params.get("direction", 0)
+        duration = params["duration_seconds"]
+        
+        # Validate parameter types and ranges
+        if not isinstance(speed, (int, float)):
+            raise ValueError(f"Speed must be numeric, got {type(speed).__name__}")
+        if not isinstance(duration, (int, float)):
+            raise ValueError(f"Duration must be numeric, got {type(duration).__name__}")
+        if not isinstance(direction, (int, float)):
+            raise ValueError(f"Direction must be numeric, got {type(direction).__name__}")
+        
+        # Safety checks
+        if speed > MAX_SAFE_SPEED_MS:
+            raise ValueError(f"Speed {speed} exceeds safety threshold of {MAX_SAFE_SPEED_MS} m/s")
+        if speed < 0:
+            raise ValueError(f"Speed must be non-negative, got {speed}")
+        if duration > MAX_DURATION_SECONDS:
+            raise ValueError(f"Duration {duration}s exceeds maximum of {MAX_DURATION_SECONDS}s")
+        if duration < 0:
+            raise ValueError(f"Duration must be non-negative, got {duration}")
+        if not (0 <= direction < MAX_DIRECTION_DEGREES):
+            raise ValueError(f"Direction {direction} must be in range [0, {MAX_DIRECTION_DEGREES})")
+        
+        distance_traveled = speed * duration
         
         return {
             "command": "drive",
@@ -408,7 +467,7 @@ def _execute_command(command: str, params: Dict[str, Any]) -> Dict[str, Any]:
             "speed": speed,
             "direction": direction,
             "duration_seconds": duration,
-            "distance_traveled": speed * duration
+            "distance_traveled": distance_traveled
         }
     
     elif command == "stop":
@@ -428,30 +487,6 @@ def _execute_command(command: str, params: Dict[str, Any]) -> Dict[str, Any]:
     
     else:
         raise ValueError(f"Unknown command: {command}")
-
-
-# ============================================================================
-# STARTUP/SHUTDOWN HOOKS
-# ============================================================================
-
-@app.on_event("startup")
-async def startup_event():
-    """Service startup initialization."""
-    telemetry.emit_event("service_started", {
-        "service": "orchestrator-ren",
-        "version": "0.1.0"
-    })
-    print("[STARTUP] Orchestrator-REN service started")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Service shutdown cleanup."""
-    telemetry.emit_event("service_stopped", {
-        "service": "orchestrator-ren",
-        "total_tickets": len(tickets_db)
-    })
-    print("[SHUTDOWN] Orchestrator-REN service stopped")
 
 
 if __name__ == "__main__":

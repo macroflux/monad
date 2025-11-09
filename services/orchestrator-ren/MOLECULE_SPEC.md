@@ -37,7 +37,7 @@
 - FastAPI >= 0.104.0
 - Uvicorn >= 0.24.0 (ASGI server)
 - Pydantic >= 2.0.0 (data validation)
-- Python 3.7+
+- Python 3.8+
 
 **Future/Planned:**
 - Database (PostgreSQL/MongoDB) for persistent ticket storage

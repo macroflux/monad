@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 SERVICE_URL = "http://localhost:8000"
-PYTHON_EXE = r"C:/Users/Kampfhund/Documents/Git Repositories/monad/.venv/Scripts/python.exe"
+PYTHON_EXE = sys.executable
 SCRIPT_DIR = Path(__file__).parent
 
 def test_service():
@@ -111,7 +111,7 @@ def test_service():
     try:
         unsafe_ticket = {
             "command": "drive",
-            "params": {"speed": 5.0, "direction": 0, "duration_seconds": 1},
+            "params": {"speed": 3.5, "direction": 0, "duration_seconds": 1},
             "priority": "normal"
         }
         resp = requests.post(f"{SERVICE_URL}/ticket", json=unsafe_ticket)
@@ -146,11 +146,31 @@ if __name__ == "__main__":
         stderr=subprocess.PIPE
     )
     
-    # Wait for service to start
+    # Wait for service to start with retry loop
     print("Waiting for service to start...")
-    time.sleep(3)
+    max_retries = 30
+    retry_delay = 0.5
+    for i in range(max_retries):
+        if proc.poll() is not None:
+            print("ERROR: Service failed to start")
+            stdout, stderr = proc.communicate()
+            print("STDOUT:", stdout.decode())
+            print("STDERR:", stderr.decode())
+            sys.exit(1)
+        
+        try:
+            resp = requests.get(f"{SERVICE_URL}/", timeout=1)
+            if resp.status_code == 200:
+                print(f"Service started successfully (after {i * retry_delay:.1f}s)")
+                break
+        except requests.exceptions.RequestException:
+            time.sleep(retry_delay)
+    else:
+        print("ERROR: Service failed to respond after {max_retries * retry_delay}s")
+        proc.terminate()
+        sys.exit(1)
     
-    # Check if process is still running
+    # Final check if process is still running
     if proc.poll() is not None:
         print("ERROR: Service failed to start")
         stdout, stderr = proc.communicate()
@@ -164,17 +184,40 @@ if __name__ == "__main__":
         
         # Stop the service
         print("\nStopping service...")
-        proc.terminate()
-        proc.wait(timeout=5)
+        try:
+            proc.terminate()
+            proc.wait(timeout=5)
+        except Exception:
+            try:
+                proc.kill()
+                proc.wait(timeout=5)
+            except Exception:
+                pass
         
         sys.exit(0 if success else 1)
     
     except KeyboardInterrupt:
         print("\nInterrupted by user")
-        proc.terminate()
+        try:
+            proc.terminate()
+            proc.wait(timeout=5)
+        except Exception:
+            try:
+                proc.kill()
+                proc.wait(timeout=5)
+            except Exception:
+                pass
         sys.exit(1)
     
     except Exception as e:
         print(f"\nUnexpected error: {e}")
-        proc.terminate()
+        try:
+            proc.terminate()
+            proc.wait(timeout=5)
+        except Exception:
+            try:
+                proc.kill()
+                proc.wait(timeout=5)
+            except Exception:
+                pass
         sys.exit(1)

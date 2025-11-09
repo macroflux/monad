@@ -5,8 +5,10 @@ Write-Host "==> Starting Orchestrator-REN..." -ForegroundColor Green
 
 # Start the service in background
 $job = Start-Job -ScriptBlock {
-    Set-Location "c:\Users\Kampfhund\Documents\Git Repositories\monad\services\orchestrator-ren"
-    & "C:/Users/Kampfhund/Documents/Git Repositories/monad/.venv/Scripts/python.exe" main.py
+    # Use the script's directory as the working directory
+    Set-Location $using:PSScriptRoot
+    # Use the Python executable from the virtual environment, relative to the script location
+    & "$using:PSScriptRoot/../../.venv/Scripts/python.exe" main.py
 }
 
 Start-Sleep -Seconds 3
