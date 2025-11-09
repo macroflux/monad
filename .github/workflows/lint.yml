@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - run: pip install ruff black mypy
+      - run: pip install ruff black mypy types-requests
       - run: ruff check .
       - run: black --check .
       - run: mypy --ignore-missing-imports --namespace-packages --explicit-package-bases .
