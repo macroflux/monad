@@ -1,0 +1,22 @@
+# .github/ISSUE_TEMPLATE/ai-task.yml
+name: AI Task
+description: Create a task for AI-assisted development
+labels: ["from-ai","triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What needs to be done
+      required: true
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      placeholder: e.g., actuator-bus, orchestrator, ci, docs
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [high, medium, low]
+      required: true
