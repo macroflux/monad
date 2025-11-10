@@ -1,0 +1,25 @@
+# .github/workflows/tests.yml
+name: tests
+on:
+  pull_request:
+    branches: [dev]
+  push:
+    branches: [dev, 'feat/**', 'exp/**']
+jobs:
+  py:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install jsonschema fastapi "pydantic>=2" uvicorn pytest httpx
+      - run: |
+          if [ -f packages/monad-contracts/validate_contracts.py ]; then
+            python packages/monad-contracts/validate_contracts.py --check-golden
+          fi
+      - run: |
+          if compgen -G "**/test_*.py" > /dev/null; then
+            pytest -q
+          else
+            echo "No tests found; skipping."
+          fi

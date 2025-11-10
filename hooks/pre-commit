@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+branch="main"
+if [ "" = "main" ] ; then
+  echo "? Pre-commit blocked: do not commit directly to main."
+  echo "Create/switch to a feature branch (feat/*) or dev."
+  exit 1
+fi
