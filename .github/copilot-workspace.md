@@ -65,4 +65,14 @@
 - [ ] Telemetry for critical events
 - [ ] Run ledger updated for experiments
 
+## Review → Plan workflow
+- Read open issues with label: from-ai
+- Prioritize by `priority` in body (high > medium > low)
+- When working on a PR:
+  - Reference the source Issue(s)
+  - Update checkboxes in the PR description
+  - Do not modify docs/charter.md or Accepted ADRs
+  - If contract changes are needed, follow Golden Contract Method
+
+
 _If a request conflicts with these rules, prefer to open a new ADR or propose an `exp/*` branch, do not modify protected docs._

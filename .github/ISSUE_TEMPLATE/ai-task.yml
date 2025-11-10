@@ -1,0 +1,19 @@
+# .github/ISSUE_TEMPLATE/ai-task.yml
+name: AI Task
+labels: ["from-ai","triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What needs to be done
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      placeholder: e.g., actuator-bus, orchestrator, ci, docs
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [high, medium, low]
