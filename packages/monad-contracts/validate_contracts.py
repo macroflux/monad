@@ -178,8 +178,8 @@ def main() -> int:
 
     if errors:
         print("Validation errors:")
-        for e in errors:
-            print(" -", e)
+        for err in errors:
+            print(" -", err)
         return 2
 
     # 3) golden hashing
@@ -219,8 +219,8 @@ def main() -> int:
 
     if args.check_golden and errors:
         print("Golden check failed:")
-        for e in errors:
-            print(" -", e)
+        for err in errors:
+            print(" -", err)
         return 3
 
     golden_status = "checked" if args.check_golden else "skipped"
