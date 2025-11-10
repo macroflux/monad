@@ -8,6 +8,7 @@ body:
     attributes:
       label: Summary
       description: What needs to be done
+    validations:
       required: true
   - type: input
     id: area
@@ -19,4 +20,5 @@ body:
     attributes:
       label: Priority
       options: [high, medium, low]
+    validations:
       required: true
