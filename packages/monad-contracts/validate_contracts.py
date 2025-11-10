@@ -19,6 +19,7 @@ from typing import Dict, List, Tuple
 
 try:
     from jsonschema import validate, Draft202012Validator
+
     JSONSCHEMA_AVAILABLE = True
 except ImportError:
     JSONSCHEMA_AVAILABLE = False
@@ -30,10 +31,12 @@ GOLDEN_FILE = CONTRACTS_DIR / "contracts.golden.json"
 
 CONTRACT_RE = re.compile(r"^(?P<name>.+)\.v(?P<ver>\d+)\.json$")
 
+
 def load_json(path: Path) -> dict:
     """Load JSON with UTF-8 BOM tolerance."""
     with path.open("r", encoding="utf-8-sig") as f:
         return json.load(f)
+
 
 def normalized_sha256(path: Path) -> str:
     """Stable, cross-OS hashing (sorted keys, compact separators)."""
@@ -43,12 +46,15 @@ def normalized_sha256(path: Path) -> str:
     ).encode("utf-8")
     return hashlib.sha256(blob).hexdigest()
 
+
 @dataclass
 class Contract:
     """Represents a MONAD contract with name, version, and file path."""
+
     name: str
     version: int
     path: Path
+
 
 def discover_contracts() -> List[Contract]:
     """Discover all contract files matching *.vN.json pattern."""
@@ -62,6 +68,7 @@ def discover_contracts() -> List[Contract]:
         )
     return files
 
+
 def load_golden() -> Dict[str, str]:
     """Load golden hash map from contracts.golden.json."""
     if GOLDEN_FILE.exists():
@@ -69,11 +76,13 @@ def load_golden() -> Dict[str, str]:
             return json.load(f)
     return {}
 
+
 def save_golden(golden: Dict[str, str]) -> None:
     """Save golden hash map to contracts.golden.json with trailing newline."""
     with GOLDEN_FILE.open("w", encoding="utf-8") as f:
         json.dump(golden, f, indent=2, sort_keys=True, ensure_ascii=False)
         f.write("\n")
+
 
 def validate_json_wellformed(path: Path) -> None:
     """Validate that JSON file is well-formed and contains an object at top level."""
@@ -82,12 +91,14 @@ def validate_json_wellformed(path: Path) -> None:
     if not isinstance(data, dict):
         raise ValueError(f"{path.name} must be a JSON object at top level.")
 
+
 def find_examples_for(contract: Contract) -> List[Path]:
     """Find example files matching <name>.vN.*.json pattern for a contract."""
     if not EXAMPLES_DIR.exists():
         return []
     pattern = f"{contract.name}.v{contract.version}.*.json"
     return sorted(EXAMPLES_DIR.glob(pattern))
+
 
 def validate_examples(contract: Contract) -> List[Tuple[Path, str]]:
     """Validate example instances against contract schema using jsonschema."""
@@ -111,6 +122,7 @@ def validate_examples(contract: Contract) -> List[Tuple[Path, str]]:
         except Exception as e:  # pylint: disable=broad-exception-caught
             failures.append((ex, str(e)))
     return failures
+
 
 def main() -> int:
     """Main entry point for contract validation."""
@@ -162,9 +174,7 @@ def main() -> int:
     if args.require_examples:
         for c in contracts:
             if not find_examples_for(c):
-                errors.append(
-                    f"[EXAMPLE] No examples found for {c.name}.v{c.version}"
-                )
+                errors.append(f"[EXAMPLE] No examples found for {c.name}.v{c.version}")
 
     if errors:
         print("Validation errors:")
@@ -219,6 +229,7 @@ def main() -> int:
         f"examples OK; golden {golden_status}."
     )
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
