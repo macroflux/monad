@@ -61,6 +61,7 @@ def load_golden() -> Dict[str, str]:
 def save_golden(golden: Dict[str, str]) -> None:
     with GOLDEN_FILE.open("w", encoding="utf-8") as f:
         json.dump(golden, f, indent=2, sort_keys=True, ensure_ascii=False)
+        f.write("\n")
 
 def validate_json_wellformed(path: Path) -> None:
     # Parsing will throw if invalid; additionally ensure it’s a JSON object.
