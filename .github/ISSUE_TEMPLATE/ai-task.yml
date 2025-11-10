@@ -1,5 +1,6 @@
 # .github/ISSUE_TEMPLATE/ai-task.yml
 name: AI Task
+description: Create a task for AI-assisted development
 labels: ["from-ai","triage"]
 body:
   - type: textarea
@@ -7,6 +8,7 @@ body:
     attributes:
       label: Summary
       description: What needs to be done
+      required: true
   - type: input
     id: area
     attributes:
@@ -17,3 +19,4 @@ body:
     attributes:
       label: Priority
       options: [high, medium, low]
+      required: true
