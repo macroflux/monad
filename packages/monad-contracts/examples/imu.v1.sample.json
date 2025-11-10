@@ -1,1 +1,1 @@
-{"timestamp":"2025-11-10T12:00:00Z","accel_x":0.5,"accel_y":-0.2,"accel_z":9.8,"gyro_x":0.01,"gyro_y":-0.02,"gyro_z":0.03}
+{"timestamp":"2025-11-10T12:00:00Z","yaw":45.0,"pitch":10.5,"roll":-5.2,"ax":0.5,"ay":-0.2,"az":9.8}

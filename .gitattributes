@@ -1,5 +1,6 @@
 # Normalize contract JSON (avoid EOL diffs and unstable hashes)
 packages/monad-contracts/*.json text eol=lf
+packages/monad-contracts/examples/*.json text eol=lf
 
 # Shell scripts and hooks use LF
 hooks/* text eol=lf
