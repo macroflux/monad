@@ -13,3 +13,4 @@ build/
 .ipynb_checkpoints/
 datasets/raw/
 artifacts/
+logs/

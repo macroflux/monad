@@ -1,0 +1,42 @@
+services:
+  orchestrator-ren:
+    build:
+      context: ./services/orchestrator_ren
+      dockerfile: Dockerfile
+    container_name: monad-orchestrator-ren
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/', timeout=2).read()"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - monad-network
+    restart: unless-stopped
+
+  actuator-bus:
+    build:
+      context: ./services/actuator_bus
+      dockerfile: Dockerfile
+    container_name: monad-actuator-bus
+    ports:
+      - "8010:8001"
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8001/', timeout=2).read()"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - monad-network
+    restart: unless-stopped
+
+networks:
+  monad-network:
+    driver: bridge
