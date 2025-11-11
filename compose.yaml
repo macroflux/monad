@@ -1,3 +1,10 @@
+# This file provides a convenient entrypoint at the repo root.
+# The source of truth is dev/compose/docker-compose.yml
+# 
+# Usage: docker compose up
+#
+# See dev/compose/README.md for full documentation.
+
 services:
   orchestrator-ren:
     build:
@@ -9,7 +16,7 @@ services:
     volumes:
       - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/', timeout=2).read()"]
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/healthz', timeout=2).read()"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -28,11 +35,14 @@ services:
     volumes:
       - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8001/', timeout=2).read()"]
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8001/healthz', timeout=2).read()"]
       interval: 30s
       timeout: 3s
       retries: 3
       start_period: 5s
+    depends_on:
+      orchestrator-ren:
+        condition: service_healthy
     networks:
       - monad-network
     restart: unless-stopped

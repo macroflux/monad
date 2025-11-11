@@ -35,20 +35,20 @@ clean:
 # ============================================================================
 
 up:
-	cd dev\compose && docker compose up -d --build
+	cd dev/compose && docker compose up -d --build
 
 down:
-	cd dev\compose && docker compose down
+	cd dev/compose && docker compose down
 
 logs:
-	cd dev\compose && docker compose logs -f
+	cd dev/compose && docker compose logs -f
 
 compose-test:
 	@echo "Testing orchestrator-ren on port 8000..."
-	@curl -s http://localhost:8000/ || echo "Failed to connect to orchestrator-ren"
+	@curl -s http://localhost:8000/healthz || echo "Failed to connect to orchestrator-ren"
 	@echo ""
 	@echo "Testing actuator-bus on port 8010..."
-	@curl -s http://localhost:8010/ || echo "Failed to connect to actuator-bus"
+	@curl -s http://localhost:8010/healthz || echo "Failed to connect to actuator-bus"
 
 compose-validate:
-	cd dev\compose && docker compose config
+	cd dev/compose && docker compose config

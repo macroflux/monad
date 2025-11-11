@@ -1,0 +1,47 @@
+name: Compose Smoke
+
+on:
+  pull_request:
+    paths:
+      - 'services/**'
+      - 'dev/compose/**'
+      - 'compose.yaml'
+      - '.github/workflows/compose-smoke.yml'
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Validate compose configuration
+        run: docker compose -f dev/compose/docker-compose.yml config
+      
+      - name: Build services
+        run: docker compose -f dev/compose/docker-compose.yml build
+      
+      - name: Start services
+        run: docker compose -f dev/compose/docker-compose.yml up -d
+      
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to be healthy..."
+          timeout 60 bash -c 'until docker compose -f dev/compose/docker-compose.yml ps | grep -q "healthy"; do sleep 2; done'
+      
+      - name: Check orchestrator-ren health
+        run: curl -f http://localhost:8000/healthz
+      
+      - name: Check actuator-bus health
+        run: curl -f http://localhost:8010/healthz
+      
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f dev/compose/docker-compose.yml logs
+      
+      - name: Cleanup
+        if: always()
+        run: docker compose -f dev/compose/docker-compose.yml down

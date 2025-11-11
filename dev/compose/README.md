@@ -22,11 +22,13 @@ docker compose up -d --build
 ### Check Service Health
 
 ```bash
-# Orchestrator-REN
-curl http://localhost:8000/
+# Health check endpoints
+curl http://localhost:8000/healthz  # orchestrator-ren
+curl http://localhost:8010/healthz  # actuator-bus
 
-# Actuator-Bus
-curl http://localhost:8010/
+# Full service info
+curl http://localhost:8000/  # orchestrator-ren
+curl http://localhost:8010/  # actuator-bus
 ```
 
 ### View Logs
@@ -75,8 +77,9 @@ Services communicate via the `monad-network` bridge network.
 
 ## Health Checks
 
-Both services include health checks via their root endpoints (`/`):
+Both services include health checks via the `/healthz` endpoint:
 
+- **Endpoint**: `/healthz` (returns `{"status": "healthy"}`)
 - **Interval**: 30 seconds
 - **Timeout**: 3 seconds
 - **Retries**: 3
@@ -86,6 +89,8 @@ Check container health:
 ```bash
 docker compose ps
 ```
+
+The actuator-bus service depends on orchestrator-ren being healthy before starting.
 
 ## Ports
 

@@ -95,6 +95,12 @@ async def root():
     return {"service": "actuator-bus", "version": "0.1.0", "status": "operational"}
 
 
+@app.get("/healthz")
+async def healthz():
+    """Health check endpoint for container orchestration."""
+    return {"status": "healthy"}
+
+
 @app.post("/actuate", response_model=ActuateResponse, status_code=status.HTTP_200_OK)
 async def actuate(request: ActuateRequest):
     """
