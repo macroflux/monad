@@ -24,6 +24,23 @@ git checkout -b feat/contracts-v1
 git checkout -b feat/orchestrator-skeleton
 ```
 
+## Docker Compose Development Stack
+
+Run orchestrator-ren and actuator-bus locally:
+
+```bash
+# Start services
+docker compose up
+
+# In another terminal - run smoke tests
+make compose-test
+
+# Stop services
+docker compose down
+```
+
+See `dev/compose/README.md` for detailed documentation.
+
 ## Branching
 - `main`: protected, release-quality
 - `dev`: integration

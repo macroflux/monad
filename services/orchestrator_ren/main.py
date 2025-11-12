@@ -244,6 +244,12 @@ async def root():
     }
 
 
+@app.get("/healthz")
+async def healthz():
+    """Health check endpoint for container orchestration."""
+    return {"status": "healthy"}
+
+
 @app.post("/ticket", response_model=Ticket, status_code=status.HTTP_201_CREATED)
 async def create_ticket(request: TicketCreateRequest):
     """
