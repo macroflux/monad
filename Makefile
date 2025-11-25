@@ -1,4 +1,4 @@
-.PHONY: help venv validate test clean
+.PHONY: help venv validate test clean up down logs
 
 help:
 	@echo "Available targets:"
@@ -6,19 +6,31 @@ help:
 	@echo "  make validate  - Run contract validator with golden checks"
 	@echo "  make test      - Run all pytest tests"
 	@echo "  make clean     - Remove virtual environment and cache files"
+	@echo "  make up        - Start services with docker compose"
+	@echo "  make down      - Stop services with docker compose"
+	@echo "  make logs      - Follow docker compose logs"
 
 venv:
 	python -m venv .venv
-	.venv\Scripts\python.exe -m pip install --upgrade pip
-	.venv\Scripts\python.exe -m pip install jsonschema fastapi "pydantic>=2" uvicorn pytest httpx requests
+	.venv/bin/python -m pip install --upgrade pip
+	.venv/bin/python -m pip install jsonschema fastapi "pydantic>=2" uvicorn pytest httpx requests
 
 validate:
-	.venv\Scripts\python.exe packages\monad-contracts\validate_contracts.py --check-golden
+	python packages/monad-contracts/validate_contracts.py --check-golden
 
 test:
-	.venv\Scripts\python.exe -m pytest -q
+	pytest -q
 
 clean:
-	if exist .venv rmdir /s /q .venv
-	for /d /r %%i in (__pycache__) do @if exist "%%i" rmdir /s /q "%%i"
-	for /d /r %%i in (.pytest_cache) do @if exist "%%i" rmdir /s /q "%%i"
+	rm -rf .venv
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+
+up:
+	docker compose up
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f

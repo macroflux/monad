@@ -1,0 +1,17 @@
+services:
+  # Placeholder for MONAD services
+  # Add your service configurations here
+  #
+  # Example:
+  # orchestrator:
+  #   build: ./services/orchestrator_ren
+  #   ports:
+  #     - "8000:8000"
+  #
+  # actuator-bus:
+  #   build: ./services/actuator_bus
+  #   ports:
+  #     - "8001:8001"
+  placeholder:
+    image: alpine:latest
+    command: ["echo", "MONAD services placeholder"]
