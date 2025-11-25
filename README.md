@@ -37,4 +37,18 @@ git checkout -b feat/orchestrator-skeleton
 - **Models:** tracked via registry with dataset + code SHA
 - **Releases:** semver; changelog automated
 
+## Development
+
+The Makefile provides shortcuts for common development tasks:
+
+```bash
+make up        # Start services with docker compose
+make down      # Stop services with docker compose
+make logs      # Follow docker compose logs
+make test      # Run all pytest tests
+make validate  # Run contract validator with golden checks
+make venv      # Create Python virtual environment and install dependencies
+make clean     # Remove virtual environment and cache files
+```
+
 See `docs/charter.md` for the Initialization Charter (v0.1).
